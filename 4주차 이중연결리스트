@@ -1,0 +1,129 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#pragma warning (disable:4996)
+
+typedef char elem;
+typedef struct Node {
+	elem data;
+	struct Node * prev, * next;
+}Node;
+void add(Node *, int, elem);
+void delete(Node*, int);
+void get(Node*, int);
+void print(Node*);
+
+void init(Node * header, Node * trailer) {
+	
+	header->prev = NULL;
+	header->next = trailer;
+
+	trailer->prev = header;
+	trailer->next = NULL;
+}
+int main() {
+	Node* head = (Node*)malloc(sizeof(Node));
+	Node *trailer = (Node*)malloc(sizeof(Node));
+	init(head, trailer);
+
+	int n, pos;
+	char ch, elm;
+	scanf("%d", &n);
+	for (int i = 0; i < n; i++) {
+		scanf(" %c", &ch);
+		if (ch == 'A') {
+			scanf("%d %c", &pos, &elm);
+			add(head, pos, elm);
+		}
+		else if (ch == 'D') {
+			scanf("%d", &pos);
+			delete(head, pos);
+		}
+		else if (ch == 'G') {
+			scanf("%d", &pos);
+			get(head, pos);
+		}
+		else {
+			print(head);
+		}
+	}
+	return 0;
+}
+void add(Node* list, int r, elem e) {
+	if (r < 1) {
+		printf("invalid position\n");
+		return;
+	}
+		Node* new_node = (Node*)malloc(sizeof(Node));
+		if (new_node == NULL)
+			return;
+
+		new_node->data = e;
+		Node* next_node = list->next;
+
+		int i = 1;
+
+		while (i < r && next_node->next != NULL) {
+			next_node = next_node->next;
+			i++;
+		}
+
+		if (i < r) {
+			printf("invalid position\n");
+			free(new_node);
+			return;
+		}
+		
+		Node * prev_node = next_node->prev;
+
+		new_node->prev = prev_node;
+		new_node->next = next_node;
+		prev_node->next = new_node;
+		next_node->prev = new_node;
+	
+}
+void delete(Node* list, int r) {
+	if (r < 1) {
+		printf("invalid position\n");
+		return;
+	}
+	Node* removed = list->next;
+
+	for (int i = 1; i < r&& removed->next != NULL; i++) {
+		removed = removed->next;
+	}
+	if (removed->next == NULL) {
+		printf("invalid position\n");
+		return;
+	}
+	
+	Node* prev_node = removed->prev;
+	Node* next_node = removed->next;
+	prev_node->next = next_node;
+	next_node->prev = prev_node;
+	free(removed);
+}
+void get(Node* list, int r) {
+	if (r < 1) {
+		printf("invalid position\n");
+		return;
+	}
+	Node* get_node = list->next;
+
+	for (int i = 1; i < r && get_node->next != NULL; i++) {
+		get_node = get_node->next;
+	}
+	if (get_node->next == NULL) {
+		printf("invalid position\n");
+		return;
+	}
+	printf("%c\n", get_node->data);
+}
+void print(Node* list) {
+	Node* prt_node = list->next;
+	while (prt_node->next != NULL) {
+		printf("%c", prt_node->data);
+		prt_node = prt_node->next;
+	}
+	printf("\n");
+}
