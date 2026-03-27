@@ -1,0 +1,103 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#pragma warning (disable:4996)
+
+typedef int element;
+typedef struct {
+	element* data;
+	int front, rear, capacity;
+} QueueType;
+void init(QueueType* Q, int size);
+void enQueue(QueueType* Q, int N);
+void deQueue(QueueType* Q);
+void print(QueueType* Q);
+int is_full(QueueType* Q);
+int is_empty(QueueType* Q);
+void delete(QueueType* Q);
+int main() {
+	QueueType* Que;
+	Que = (QueueType*)malloc(sizeof(QueueType));
+
+	int q, n, N;
+	char ch; 
+	scanf("%d %d", &q, &n);
+	init(Que, q);
+
+	for (int i = 0; i < n; i++) {
+		scanf(" %c", &ch);
+		if (ch == 'I') {
+			scanf("%d", &N);
+			if (is_full(Que)) {
+				printf("overflow");
+				print(Que);
+				return 0;
+			}
+			enQueue(Que, N);
+		}
+		else if (ch == 'D') {
+			if (is_empty(Que)){
+				printf("underflow ");
+				return 0;
+			}
+			deQueue(Que);
+		}
+		else if (ch == 'P') {
+			print(Que);
+		}
+	}
+	delete(Que);
+	free(Que);
+	return 0;
+}
+void init(QueueType* Q, int size) {
+	Q->front = 0;
+	Q->rear = 0;
+	Q->data = (element*)malloc(size * sizeof(element));
+	Q->capacity = size;
+	if (Q->data == NULL)
+		return;
+	for (int i = 0; i < size; i++) {
+		Q->data[i] = 0;
+	}
+}
+void enQueue(QueueType* Q, int N) {
+	if (is_full(Q)) {
+		printf("overflow");
+		print(Q);
+		return; 
+	}
+	else {
+		Q->rear = (Q->rear + 1) % Q->capacity;
+		Q->data[Q->rear] = N;
+	}
+}
+void deQueue(QueueType* Q) {
+	if (is_empty(Q)) {
+		printf("underflow ");
+		return; 
+	}
+	else {
+		Q->front = (Q->front + 1) % Q->capacity;
+		Q->data[Q->front % Q->capacity] = 0;
+	}
+}
+void print(QueueType* Q) {
+	for (int i = 0; i < Q->capacity; i++) {
+		printf(" %d", Q->data[i]);
+	}
+	printf("\n");
+}
+int is_full(QueueType* Q) {
+	if (Q->front == (Q->rear + 1) % Q->capacity)
+		return 1;
+	return 0;
+}
+int is_empty(QueueType* Q) {
+	if (Q->front == Q->rear)
+		return 1;
+	return 0;
+}
+void delete(QueueType* Q) {
+	free(Q->data);
+}
