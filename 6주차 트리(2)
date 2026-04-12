@@ -1,0 +1,94 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#pragma warning (disable:4996)
+
+typedef struct TreeNode {
+	struct TreeNode* left, * right;
+	int id, data;
+} TreeNode;
+TreeNode * createNode(int id, int data);
+void pre_order(TreeNode*);
+void in_order(TreeNode*);
+void post_order(TreeNode*);
+TreeNode* findNode(TreeNode*, int);
+int main() {
+	TreeNode* n1, *n2,* n3,* n4,* n5,* n6,* n7,* n8;
+	n1 = createNode(1, 20);
+	n2 = createNode(2, 30);
+	n3 = createNode(3, 50);
+	n4 = createNode(4, 70);
+	n5 = createNode(5, 90);
+	n6 = createNode(6, 120);
+	n7 = createNode(7, 130);
+	n8 = createNode(8, 80);
+
+	n1->left = n2, n1->right = n3;
+	n2->left = n4, n2->right = n5;
+	n3->left = NULL, n3->right = n6;
+	n4->left = NULL, n4->right = NULL;
+	n5->left = NULL, n5->right = NULL;
+	n6->left = n7, n6->right = n8;
+	n7->left = NULL, n7->right = NULL;
+	n8->left = NULL, n8->right = NULL;
+
+	int order, id;
+	scanf("%d %d", &order, &id);
+	if (id < 1 || id > 8) {
+		printf("-1\n");
+		return 0;
+	}
+	TreeNode * targetNode = findNode(n1, id);
+	if (order == 1) {
+		pre_order(targetNode);
+	}
+	else if (order == 2) {
+		in_order(targetNode);
+	}
+	else if (order == 3) {
+		post_order(targetNode);
+	}
+	return 0;
+}
+TreeNode* createNode(int id, int data) {
+	TreeNode * NewNode = (TreeNode*)malloc(sizeof(TreeNode));
+
+	NewNode->id = id;
+	NewNode->data = data;
+	NewNode->left = NULL;
+	NewNode->right = NULL;
+
+	return NewNode;
+}
+TreeNode* findNode(TreeNode* root, int target_id) {
+	if (!root)
+		return NULL;
+	if (root->id == target_id)
+		return root;
+	TreeNode* left = findNode(root->left, target_id);
+	if (left)
+		return left;
+	return findNode(root->right, target_id);
+}
+
+void pre_order(TreeNode* root) {
+	if (!root)
+		return;
+	printf(" %d", root->data);
+	pre_order(root->left);
+	pre_order(root->right);
+}
+void in_order(TreeNode* root) {
+	if (!root)
+		return;
+	in_order(root->left);
+	printf(" %d", root->data);
+	in_order(root->right);
+}
+void post_order(TreeNode* root) {
+	if (!root)
+		return;
+	post_order(root->left);
+	post_order(root->right);
+	printf(" %d", root->data);
+}
