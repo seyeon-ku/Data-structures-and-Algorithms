@@ -3,7 +3,7 @@
 #pragma warning(disable:4996)
 #define max(a, b) (((a) > (b))? (a) : (b))
 
-int seq_search(int key, int low, int high) { //순차 탐색, 정렬된 자료를 찾을 때 씀, 복잡도 O(m + n/m)) 인덱스 테이블 크기 m, 주 자료 리스트 크기n
+int seq_search(int key, int low, int high) { //순차 탐색,  정렬되지 않은 자료를 찾을 때 씀, 복잡도 O(n)
     int i;
     list[high + 1] = key;
     for (i = low; list[i] != key; i++) {
