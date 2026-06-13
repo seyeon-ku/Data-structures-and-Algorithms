@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+#pragma warning(disable:4996)
+#define SWAP(x, y, t) ((t) = (x), (x) = (y), (y) = (t));
+
+void selection_sort(int A[], int n) { // 선택정렬 시간복잡도 O(n^2) (최선=평균=최악)
+    int least, tmp;
+    for (int i = 0; i < n - 1; i++) { // 마지막 원소는 정렬 할 필요 없기 때문에 n - 1까지 반복
+        least = i;
+        for (int j = i + 1; j < n; j++) {
+            if (A[j] < A[least])
+                least = j;
+            SWAP(A[j], A[least], tmp);
+        }
+    }
+}
+
+void insert_sort(int list[], int n) { // 삽입정렬 시간복잡도 최선: O(n), 평균, 최악: O(n^2)
+    int i, j, key;
+    for (i = 1; i < n; i++) {
+        key = list[i];
+        j = i - 1;
+
+        while (j >= 0 && list[j] > key) {
+            list[j + 1] = list[j];
+            j--;
+        }
+        list[j + 1] = key;
+    }
+}
+
+void bubble_sort(int list[], int n) { // 버블정렬 , 시간복잡도 O(n^2)
+    int j, i, tmp;
+    for (i = n - 1; i > 0; i--) {
+        for (j = 0; j < i; j++)
+            if (list[j] > list[j + 1])
+                SWAP(list[j], list[j + 1], tmp);
+    }
+}
