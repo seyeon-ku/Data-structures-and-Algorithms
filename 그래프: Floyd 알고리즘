@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TRUE 1
+#define FALSE 0
+#define MAX_VERTICES 100
+#define INF 1000000 // 연결이 없는 경우 (무한대)
+
+// 인접 행렬을 사용하는 그래프 구조체 (다익스트라, 프림과 동일)
+typedef struct GraphType {
+    int n; // 정점의 개수
+    int weight[MAX_VERTICES][MAX_VERTICES];
+} GraphType;
+
+// 최단 거리 결과를 저장할 2차원 배열
+int A[MAX_VERTICES][MAX_VERTICES];
+
+// 현재 2차원 배열(지도)의 상태 출력 함수
+void print_matrix(GraphType* g) {
+    printf("-----------------------------------------\n");
+    for (int i = 0; i < g->n; i++) {
+        for (int j = 0; j < g->n; j++) {
+            if (A[i][j] == INF)
+                printf("%5s ", "INF");
+            else
+                printf("%5d ", A[i][j]);
+        }
+        printf("\n");
+    }
+    printf("-----------------------------------------\n");
+}
+
+void floyd(GraphType* g) {
+    // 1. 결과 배열 A를 그래프의 초기 인접 행렬(직통 거리) 값으로 복사
+    for (int i = 0; i < g->n; i++) {
+        for (int j = 0; j < g->n; j++) {
+            A[i][j] = g->weight[i][j];
+        }
+    }
+
+    // 2. 3중 for문 (k: 경유지, i: 출발지, j: 도착지)
+    for (int k = 0; k < g->n; k++) {
+        for (int i = 0; i < g->n; i++) {
+            for (int j = 0; j < g->n; j++) {
+
+                // i에서 j로 직접 가는 것보다, k를 거쳐서(i -> k -> j) 가는 게 더 빠르다면 갱신!
+                if (A[i][k] + A[k][j] < A[i][j]) {
+                    A[i][j] = A[i][k] + A[k][j];
+                }
+
+            }
+        }
+        print_matrix(g);
+    }
+}
+
+int main(void) {
+    // 앞서 다익스트라에서 썼던 것과 유사한 5개 정점짜리 가중치 그래프 예시
+    // 자기 자신으로 가는 거리는 0, 길이 없으면 INF
+    GraphType g = { 5,
+        {{ 0,   6,   7,   INF, INF },
+         { INF, 0,   8,   5,   -4  }, // 음수 간선도 포함 가능
+         { INF, INF, 0,   -3,  9   },
+         { INF, INF, INF, 0,   7   },
+         { INF, INF, INF, INF, 0   }}
+    };
+
+    printf("=== 초기 그래프 인접 행렬 상태 ===\n");
+    // 초기 상태 출력을 위해 잠시 A 배열에 복사 후 출력
+    for (int i = 0; i < g.n; i++) {
+        for (int j = 0; j < g.n; j++) A[i][j] = g.weight[i][j];
+    }
+    print_matrix(&g);
+
+    floyd(&g);
+
+    return 0;
+}
