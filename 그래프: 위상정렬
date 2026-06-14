@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int topo_sort(GraphType* g)
+{
+	int i;
+	StackType s;
+	GraphNode* node;
+	// 모든정점의진입차수를계산
+	int* in_degree = (int*)malloc(g->n * sizeof(int));
+	for (i = 0; i < g->n; i++)  // 초기화
+		in_degree[i] = 0;
+	for (i = 0; i < g->n; i++) {
+		GraphNode* node = g->adj_list[i]; //정점i에서나오는간선들
+		while (node != NULL) {
+			in_degree[node->vertex]++;
+			node = node->link;
+		}
+	}
+	// 진입차수가0인정점을스택에삽입
+	init(&s);
+	for (i = 0; i < g->n; i++) {
+		if (in_degree[i] == 0) push(&s, i);
+	}
+	// 위상순서를생성
+	while (!is_empty(&s)) {
+		int w;
+		w = pop(&s);
+		printf("정점%d ->", w);  //정점출력
+		node = g->adj_list[w]; //각정점의진입차수를변경
+		while (node != NULL) {
+			int u = node->vertex;
+			in_degree[u]--;  //진입차수를감소
+			if (in_degree[u] == 0) push(&s, u);
+			node = node->link;   // 다음정점
+		}
+	}
+	free(in_degree);
+	printf("\n");
+	return (i == g->n); // 반환값이1이면성공, 0이면실패
+}
