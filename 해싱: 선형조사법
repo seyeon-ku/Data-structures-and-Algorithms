@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#pragma warning(disable:4996)
+
+#define KEY_SIZE 10 // 탐색키의최대길이
+#define TABLE_SIZE 13 // 해싱테이블의크기=소수
+typedef struct
+{
+    char key[KEY_SIZE];
+    // 다른필요한필드들
+} element;
+element hash_table[TABLE_SIZE]; // 해싱테이블
+void init_table(element ht[])
+{
+    int i;
+    for (i = 0; i < TABLE_SIZE; i++) {
+        ht[i].key[0] = '\0';
+    }
+}// 문자로된키를숫자로변환*
+int transform(char* key)
+{
+    int number = 0;
+    while (*key)
+        number = 31 * number + *key++;
+    return number;
+}
+// 제산함수를사용한해싱함수
+int hash_function(char* key)
+{
+    // 키를자연수로변환한다음테이블의크기로나누어나머지를반환
+    return transform(key) % TABLE_SIZE;
+}
+#define empty(item) (strlen(item.key)==0)
+#define equal(item1, item2) (!strcmp(item1.key,item2.key))
+// 선형조사법을이용하여테이블에키를삽입하고, 테이블이가득찬경우는종료
+void hash_lp_add(element item, element ht[]) {
+    int i, hash_value;
+    hash_value = i = hash_function(item.key);
+    //printf("hash_address=%d\n", i);
+    while (!empty(ht[i])) {
+        if (equal(item, ht[i])) {
+            fprintf(stderr, "탐색키가중복되었습니다\n");
+            exit(1);
+        }
+        i = (i + 1) % TABLE_SIZE;
+        if (i == hash_value) {
+            fprintf(stderr, "테이블이가득찼습니다\n");
+            exit(1);
+        }
+    }
+    ht[i] = item;
+}
+// 선형조사법을이용하여테이블에저장된키를탐색
+void hash_lp_search(element item, element ht[]) {
+    int i, hash_value;
+    hash_value = i = hash_function(item.key);
+    while (!empty(ht[i])) {
+        if (equal(item, ht[i])) {
+            fprintf(stderr, "탐색%s: 위치= %d\n", item.key, i);
+            return;
+        }
+        i = (i + 1) % TABLE_SIZE;
+        if (i == hash_value) {
+            fprintf(stderr, "찾는값이테이블에없음\n");
+            return;
+        }
+    }
+    fprintf(stderr, "찾는값이테이블에없음\n");
+}
+void hash_lp_print(element ht[]) { // 해싱테이블의내용을출력
+    int i;
+    printf("\n===============================\n");
+    for (i = 0; i < TABLE_SIZE; i++)
+        printf("[%d] %s\n", i, ht[i].key);
+    printf("===============================\n\n");
+}
+int main(void) { // 해싱테이블을사용한예제
+    char* s[7] = { "do", "for", "if", "case", "else", "return", "function" };
+    element e;
+    init_table(hash_table);
+    for (int i = 0; i < 7; i++) {
+        strcpy(e.key, s[i]);
+        hash_lp_add(e, hash_table); // 선형조사법을이용하여테이블에키를삽입, 테이블이가득찬경우는종료
+        hash_lp_print(hash_table);
+    }
+    for (int i = 0; i < 7; i++) {
+        strcpy(e.key, s[i]);
+        hash_lp_search(e, hash_table); // 선형조사법을이용하여테이블에저장된키를탐색
+    }
+    return 0;
+}
