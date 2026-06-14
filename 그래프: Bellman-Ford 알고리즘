@@ -1,0 +1,80 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#pragma warning(disable:4996)
+
+#define TRUE 1
+#define FALSE 0
+#define MAX_VERTICES 100
+#define INF 1000000 // 연결이 없는 경우 (무한대)
+
+// 간선을 나타내는 구조체
+struct Edge {
+    int start;  // 출발 정점
+    int end;    // 도착 정점
+    int weight; // 간선의 가중치 (음수 가능)
+};
+
+// 그래프를 나타내는 구조체 (크루스칼과 동일한 구조)
+typedef struct GraphType {
+    int no_v;  // 정점의 개수
+    int no_e;  // 간선의 개수
+    struct Edge edges[2 * MAX_VERTICES];
+} GraphType;
+
+// 그래프 초기화
+void graph_init(GraphType* g, int v) {
+    g->no_v = v;
+    g->no_e = 0;
+}
+
+// 간선 삽입
+void insert_edge(GraphType* g, int start, int end, int w) {
+    if (g->no_e >= 2 * MAX_VERTICES) {
+        fprintf(stderr, "오류: 간선의 수가 최대값을 초과했습니다.\n");
+        return;
+    }
+    g->edges[g->no_e].start = start;
+    g->edges[g->no_e].end = end;
+    g->edges[g->no_e].weight = w;
+    g->no_e++;
+}
+
+// 벨만-포드 알고리즘 주 실행 함수
+int bellman_ford(GraphType* g, int start, int distance[]) {
+    // 1. 거리 배열 초기화
+    for (int i = 0; i < g->no_v; i++) {
+        distance[i] = INF;
+    }
+    distance[start] = 0; // 시작 정점은 자기 자신이니까 0
+
+    // 2. 정점 개수(V) - 1 번만큼 모든 간선을 완화(Relaxation) 반복
+    for (int i = 0; i < g->no_v - 1; i++) {
+        for (int j = 0; j < g->no_e; j++) {
+            int u = g->edges[j].start;
+            int v = g->edges[j].end;
+            int weight = g->edges[j].weight;
+
+            // 출발지가 방문된 적이 있고, 거쳐서 가는 게 더 지름길이라면 장부 갱신!
+            if (distance[u] != INF && distance[u] + weight < distance[v]) {
+                distance[v] = distance[u] + weight;
+            }
+        }
+    }
+
+    // 3. 음수 사이클(값 무한 복사 루프) 존재 여부 검사 (V번째 완화 시도)
+    for (int j = 0; j < g->no_e; j++) {
+        int u = g->edges[j].start;
+        int v = g->edges[j].end;
+        int weight = g->edges[j].weight;
+
+        // 분명 V-1번 돌아서 다 끝났어야 하는데, 또 거리가 줄어드는 정점이 발견된다면?
+        if (distance[u] != INF && distance[u] + weight < distance[v]) {
+            printf("그래프 내에 음수 가중치 사이클이 존재 (최단 거리 계산 불가)\n");
+            return FALSE; // 음수 사이클 발견됨을 알림
+        }
+    }
+
+    return TRUE; // 정상 종료
+}
